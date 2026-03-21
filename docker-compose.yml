@@ -1,0 +1,13 @@
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Permite al back crear otros contenedores
+    ports:
+      - "8000:8000"
+    networks:
+      - plataforma-net
+
+networks:
+  plataforma-net:
+    driver: bridge
