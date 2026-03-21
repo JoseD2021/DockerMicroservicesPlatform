@@ -1,10 +1,21 @@
 services:
   backend:
     build: ./backend
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_RUN_PORT=8000
+      - FLASK_RUN_HOST=0.0.0.0
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # Permite al back crear otros contenedores
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8000:8000"
+    networks:
+      - plataforma-net
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"         
     networks:
       - plataforma-net
 
