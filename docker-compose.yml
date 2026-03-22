@@ -18,6 +18,8 @@ services:
       - "80:80"         
     networks:
       - plataforma-net
+    volumes:
+      - ./frontend:/usr/share/nginx/html
 
 networks:
   plataforma-net:
