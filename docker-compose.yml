@@ -1,4 +1,19 @@
 services:
+  traefik:
+    image: traefik:v3.6.11
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "//var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - plataforma-net
+
   backend:
     build: ./backend
     environment:
@@ -6,17 +21,23 @@ services:
       - FLASK_RUN_PORT=8000
       - FLASK_RUN_HOST=0.0.0.0
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ./backend:/app
-    ports:
-      - "8000:8000"
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
     networks:
       - plataforma-net
 
   frontend:
     build: ./frontend
-    ports:
-      - "80:80"         
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
     networks:
       - plataforma-net
 

@@ -3,7 +3,7 @@ from flask_cors import CORS
 import docker
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost"}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost", "http://api.localhost"]}})
 
 try:
     client = docker.from_env()
