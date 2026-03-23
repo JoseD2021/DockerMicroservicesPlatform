@@ -5,7 +5,7 @@ const jsSvg = "https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_Ja
 
 window.addEventListener("DOMContentLoaded", async () => {
     try {
-        let response = await fetch("/api/microservices"); // TODO: Cambiar endpoint a uno real
+        let response = await fetch("http://localhost:8000/servicios"); // TODO: Cambiar endpoint a uno real
 
         let microservices = await response.json();
         microservices.forEach(micro => {
@@ -91,7 +91,9 @@ function getStatus(status) {
     switch (status) {
         case "running":
             return "bg-green-500 shadow-green-500 animate-pulse";
-        case "stopped":
+        case "restarting":
+            return "bg-yellow-500 shadow-yellow-500 animate-pulse";
+        case "paused":
             return "bg-red-500 shadow-red-500";
         default:
             return "bg-gray-500";
@@ -103,18 +105,18 @@ function structureMicroservice(micro) {
     return `
             <div class="bg-stone-700 p-4 rounded-md text-white relative">
                 <div class="absolute top-2 right-2">
-                    <div class="relative w-5 h-5 ${getStatus(micro.status)} rounded-full">
-                        <div class="absolute w-[50%] h-[50%] inset-0 ${getStatus(micro.status)} blur-xl -z-10"></div>
+                    <div class="relative w-5 h-5 ${getStatus(micro.estado)} rounded-full">
+                        <div class="absolute w-[50%] h-[50%] inset-0 ${getStatus(micro.estado)} blur-xl -z-10"></div>
                     </div>
                 </div>
                 <div class="flex flex-row gap-2 items-center">
                     <img src="${getLanguageIcon(micro.lang)}" alt="Language Icon" class="h-8 pointer-events-none select-none">
-                    <h2 class="font-bold text-lg">${micro.name ?? `Microcontrolador ${micro.id}`}</h2>                    
+                    <h2 class="font-bold text-lg">${micro.nombre ?? `Microcontrolador ${micro.id}`}</h2>                    
                 </div>
                 <div class="bg-stone-600 p-2 rounded-xl mt-2">
-                    <p class="text-sm text-gray-400">${micro.description ?? "Sin descripción..."}</p>
+                    <p class="text-sm text-gray-400">${micro.descripcion ?? "Sin descripción..."}</p>
                 </div>
-                <pre class="language-${micro.lang} rounded-xl" ><code class="language-${micro.lang}">${micro.code}</code></pre>
+                <pre class="language-${micro.lang} rounded-xl" ><code class="language-${micro.lang}">${micro.codigo}</code></pre>
                 <a href="/microservices/${micro.id}" class="text-blue-400 hover:text-blue-300 underline" target="_blank">Ir a endpoint</a>
                 <div class="flex flex-row gap-2 mt-4 justify-end">
                     <button id="turnOnButton" data-id="${micro.id}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Habilitar</button>
