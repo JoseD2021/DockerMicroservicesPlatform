@@ -1,13 +1,13 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 import docker
 
 app = Flask(__name__)
-
 
 try:
     client = docker.from_env()
 except Exception as e:
     print(f"Error de conexión: {e}")
+    client = None
 
 @app.route('/')
 def home():
@@ -15,7 +15,10 @@ def home():
 
 @app.route('/servicios', methods=['GET'])
 def listar_servicios():
-    containers = client.containers.list(all=True)
+    if client is None:
+        return jsonify({"error": "No se pudo establecer un cliente Docker"}), 500
+    
+    containers = client.containers.list()
     lista = [{"id": c.id[:10], "nombre": c.name, "estado": c.status} for c in containers]
     return jsonify(lista)
 

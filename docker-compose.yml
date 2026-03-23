@@ -7,6 +7,7 @@ services:
       - FLASK_RUN_HOST=0.0.0.0
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./backend:/app
     ports:
       - "8000:8000"
     networks:
