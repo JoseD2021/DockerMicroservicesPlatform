@@ -40,7 +40,7 @@ def listar_servicios():
                 "code": c.labels.get("code", "")
             }
         } for c in containers]
-    print(lista)
+    # print(lista)
     return jsonify(lista)
 
 @app.route('/servicios/nuevo', methods=['POST'])

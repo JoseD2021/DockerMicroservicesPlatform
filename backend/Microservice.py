@@ -43,7 +43,10 @@ class Microservice:
             self._setup_python(path)
         else:
             raise ValueError("Lenguaje no soportado")
-
+            
+        """ if self.language == "js": mover arriba cuando se implemente
+            self._setup_js(path) """
+        
         # 3. Build de imagen
         image, logs = client.images.build(
             path=path,
@@ -82,6 +85,10 @@ CMD ["python", "main.py"]
 """
         with open(os.path.join(path, "Dockerfile"), "w") as f:
             f.write(dockerfile)
+    
+    # TODO: Implementar setup para JS
+    def _setup_js(self, path):
+        pass
     
     def deploy_container(self, client):
         nombre_contenedor = self.image_tag

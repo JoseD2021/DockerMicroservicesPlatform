@@ -36,7 +36,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         let deleteButtons = document.querySelectorAll("#deleteButton");
 
 
-        // TODO: Funcionalidad con la API real
+        // TODO: Funcionalidad con la API real de HABILITAR, DESHABILITAR Y ELIMINAR microservicios
         turnOnButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
                 let id = e.target.dataset.id;
@@ -101,8 +101,6 @@ function getStatus(status) {
 }
 
 function structureMicroservice(micro) {
-    console.log(micro);
-    // TODO: Cambiar <a href>
     return `
             <div class="bg-stone-700 p-4 rounded-md text-white relative">
                 <div class="absolute top-2 right-2">
@@ -118,7 +116,7 @@ function structureMicroservice(micro) {
                     <p class="text-sm text-gray-400">${micro.ms.description ?? "Sin descripción..."}</p>
                 </div>
                 <pre class="language-${micro.ms.language} rounded-xl" ><code class="language-${micro.ms.language}">${micro.ms.code}</code></pre>
-                <a href="/microservices/${micro.id}" class="text-blue-400 hover:text-blue-300 underline" target="_blank">Ir a endpoint</a>
+                <a href="/${micro.ms.name}" class="text-blue-400 hover:text-blue-300 underline" target="_blank">Ir a endpoint</a>
                 <div class="flex flex-row gap-2 mt-4 justify-end">
                     <button id="turnOnButton" data-id="${micro.id}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Habilitar</button>
                     <button id="turnOffButton" data-id="${micro.id}" class="bg-red-400 hover:bg-red-400 text-white px-3 py-1 rounded-md hover:cursor-pointer">Deshabilitar</button>
