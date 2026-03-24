@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from Microservice import MicroserviceManager
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import docker
 
@@ -7,6 +8,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost"}})
 
 try:
     client = docker.from_env()
+    manager = MicroserviceManager(client)
 except Exception as e:
     print(f"Error de conexión: {e}")
     client = None
@@ -20,9 +22,44 @@ def listar_servicios():
     if client is None:
         return jsonify({"error": "No se pudo establecer un cliente Docker"}), 500
     
-    containers = client.containers.list()
-    lista = [{"id": c.id[:10], "nombre": c.name, "estado": c.status} for c in containers]
+    containers = client.containers.list(filters={"network": "dockermicroservicesplatform_plataforma-net"})
+    containers = [
+        c for c in containers
+        if any(name.startswith("ms_") for name in c.name.split())
+    ]
+    
+    
+    lista = [{
+            "id": c.id[:10],
+            "nombre": c.name,
+            "estado": c.status,
+            "ms": {
+                "name": c.labels.get("name", ""),
+                "description": c.labels.get("description", ""),
+                "language": c.labels.get("language", ""),
+                "code": c.labels.get("code", "")
+            }
+        } for c in containers]
+    print(lista)
     return jsonify(lista)
+
+@app.route('/servicios/nuevo', methods=['POST'])
+def crear_servicio():
+    if client is None:
+        return jsonify({"error": "No se pudo establecer un cliente Docker"}), 500
+    
+    data = request.get_json()
+    name = data.get('name')
+    description = data.get('description')
+    lang = data.get('lang')
+    code = data.get('code')
+    
+    if(not name or not description or not lang or not code):
+        return jsonify({"error": "Faltan parámetros requeridos"}), 400    
+    
+    manager.add_microservice(name, description, lang, code)
+    
+    return jsonify({"mensaje": "Microservicio creado exitosamente", **data})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

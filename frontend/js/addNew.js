@@ -10,12 +10,8 @@ newServiceButton.addEventListener("click", async (e) => {
         return;
     }
 
-    console.log({lang, code, name, description});
-
     try {
-
-        // TODO: Modificar esto, probablemente
-        let response = await fetch("/api/microservices", {
+        let response = await fetch("http://localhost:8000/servicios/nuevo", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -25,7 +21,8 @@ newServiceButton.addEventListener("click", async (e) => {
 
         if (response.ok) {
             alert("Microservicio creado exitosamente.");
-            location.reload();
+            console.log(await response.json())
+            // location.reload();
         }
     } catch (error) {
         console.log("Error al crear el microservicio.");

@@ -5,7 +5,7 @@ const jsSvg = "https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_Ja
 
 window.addEventListener("DOMContentLoaded", async () => {
     try {
-        let response = await fetch("http://localhost:8000/servicios"); // TODO: Cambiar endpoint a uno real
+        let response = await fetch("http://localhost:8000/servicios");
 
         let microservices = await response.json();
         microservices.forEach(micro => {
@@ -101,6 +101,7 @@ function getStatus(status) {
 }
 
 function structureMicroservice(micro) {
+    console.log(micro);
     // TODO: Cambiar <a href>
     return `
             <div class="bg-stone-700 p-4 rounded-md text-white relative">
@@ -110,13 +111,13 @@ function structureMicroservice(micro) {
                     </div>
                 </div>
                 <div class="flex flex-row gap-2 items-center">
-                    <img src="${getLanguageIcon(micro.lang)}" alt="Language Icon" class="h-8 pointer-events-none select-none">
-                    <h2 class="font-bold text-lg">${micro.nombre ?? `Microcontrolador ${micro.id}`}</h2>                    
+                    <img src="${getLanguageIcon(micro.ms.language)}" alt="Language Icon" class="h-8 pointer-events-none select-none">
+                    <h2 class="font-bold text-lg">${micro.ms.name ?? `Microcontrolador ${micro.id}`}</h2>                    
                 </div>
                 <div class="bg-stone-600 p-2 rounded-xl mt-2">
-                    <p class="text-sm text-gray-400">${micro.descripcion ?? "Sin descripción..."}</p>
+                    <p class="text-sm text-gray-400">${micro.ms.description ?? "Sin descripción..."}</p>
                 </div>
-                <pre class="language-${micro.lang} rounded-xl" ><code class="language-${micro.lang}">${micro.codigo}</code></pre>
+                <pre class="language-${micro.ms.language} rounded-xl" ><code class="language-${micro.ms.language}">${micro.ms.code}</code></pre>
                 <a href="/microservices/${micro.id}" class="text-blue-400 hover:text-blue-300 underline" target="_blank">Ir a endpoint</a>
                 <div class="flex flex-row gap-2 mt-4 justify-end">
                     <button id="turnOnButton" data-id="${micro.id}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Habilitar</button>
