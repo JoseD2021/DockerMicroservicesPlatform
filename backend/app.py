@@ -1,5 +1,5 @@
 from Microservice import MicroserviceManager
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
 from flask_cors import CORS
 import docker
 
@@ -15,7 +15,8 @@ except Exception as e:
 
 @app.route('/')
 def home():
-    return jsonify({"mensaje": "Backend Orquestador con Flask activo"})
+    # return jsonify({"mensaje": "Backend Orquestador con Flask activo"})
+    return redirect("http://localhost/") # 
 
 @app.route('/servicios', methods=['GET'])
 def listar_servicios():
@@ -60,6 +61,16 @@ def crear_servicio():
     manager.add_microservice(name, description, lang, code)
     
     return jsonify({"mensaje": "Microservicio creado exitosamente", **data})
+
+@app.route('/deletems/<ms_id>', methods=['DELETE'])
+def deletems(ms_id):
+    try:
+        manager.delete(ms_id)
+        return jsonify({"status": "success", "mensaje": f"Microservicio {ms_id} eliminado."})
+    except Exception as e:
+        print(f"DEBUG ERROR: {e}")
+        return jsonify({"status": "error", "mensaje": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

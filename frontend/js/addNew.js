@@ -21,6 +21,7 @@ newServiceButton.addEventListener("click", async (e) => {
 
         if (response.ok) {
             alert("Microservicio creado exitosamente.");
+            await load();
             console.log(await response.json())
             // location.reload();
         }

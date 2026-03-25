@@ -16,6 +16,15 @@ class MicroserviceManager:
         
     def get_microservices(self):
         return self.microservices
+    
+    def delete(self, ms_id): 
+        try:
+            container = self.client.containers.get(ms_id)
+            container.stop()
+            container.remove()
+        except Exception as e:
+            print(f"Error interno en delete: {e}")
+    
 
 class Microservice:
     def __init__(self, name, description, language, code):

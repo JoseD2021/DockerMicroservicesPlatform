@@ -3,7 +3,9 @@ let microList = document.getElementById("micro-list");
 const pythonSvg = "https://s3.dualstack.us-east-2.amazonaws.com/pythondotorg-assets/media/files/python-logo-only.svg"
 const jsSvg = "https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"
 
-window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("DOMContentLoaded", async () => load());
+
+async function load (){
     try {
         let response = await fetch("http://localhost:8000/servicios");
 
@@ -56,17 +58,39 @@ window.addEventListener("DOMContentLoaded", async () => {
         deleteButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
                 let id = e.target.dataset.id;
+                
+                try {
 
-                console.log(`Deleting microservice ${id}`);
+                    let response = await fetch(`http://localhost:8000/deletems/${id}`, {
+                        method: "DELETE"
+                    });
+            
+                    let datos = await response.json();
+
+                    if (datos.status === 'success') {
+                        alert("Microservicio borrado exitosamente.");
+                        const card = button.closest('.micro-card'); 
+                        if (card) {
+                            card.remove();
+                        }
+                        // console.log(datos)
+                        // location.reload();
+                    }
+                } catch (error) {
+                    console.log("Error al borrar el microservicio.");
+                    alert("Error al borrar el microservicio.");
+                    return;
+                }
+                // console.log(`Deleting microservice ${id}`);
             })
         });
     }
 
-});
+}
 
 function createMicroDiv(micro) {
     let microDiv = document.createElement("div");
-    microDiv.classList.add("bg-stone-700", "p-4", "rounded-md", "text-white");
+    microDiv.classList.add("bg-stone-700", "p-4", "rounded-md", "text-white", "micro-card");
     microDiv.innerHTML = structureMicroservice(micro);
     return microDiv;
 }
@@ -120,7 +144,7 @@ function structureMicroservice(micro) {
                 <div class="flex flex-row gap-2 mt-4 justify-end">
                     <button id="turnOnButton" data-id="${micro.id}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Habilitar</button>
                     <button id="turnOffButton" data-id="${micro.id}" class="bg-red-400 hover:bg-red-400 text-white px-3 py-1 rounded-md hover:cursor-pointer">Deshabilitar</button>
-                    <button id="deleteButton" data-id="${micro.id}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Eliminar</button>
+                    <button id="deleteButton" class="deleteButton" data-id="${micro.id}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Eliminar</button>
                 </div>
             </div>
         `;
