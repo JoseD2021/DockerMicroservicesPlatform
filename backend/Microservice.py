@@ -25,6 +25,21 @@ class MicroserviceManager:
         except Exception as e:
             print(f"Error interno en delete: {e}")
     
+    def disable(self, ms_id):
+        try:
+            container = self.client.containers.get(ms_id)
+            container.stop()
+        except Exception as e:
+            print(f"Error interno en disable: {e}")
+
+
+    def enable(self, ms_id):
+        try:
+            container = self.client.containers.get(ms_id)
+            container.start()
+        except Exception as e:
+            print(f"Error interno en enable: {e}")
+    
 
 class Microservice:
     def __init__(self, name, description, language, code):

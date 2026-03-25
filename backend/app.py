@@ -70,6 +70,25 @@ def deletems(ms_id):
     except Exception as e:
         print(f"DEBUG ERROR: {e}")
         return jsonify({"status": "error", "mensaje": str(e)}), 500
+    
+@app.route('/disablems/<ms_id>', methods=['POST'])
+def disable_ms(ms_id):
+    try:
+        manager.disable(ms_id)
+        return jsonify({"status": "success", "mensaje": f"Microservicio {ms_id} deshabilitado."})
+    except Exception as e:
+        print(f"DEBUG ERROR: {e}")
+        return jsonify({"status": "error", "mensaje": str(e)}), 500
+
+
+@app.route('/enablems/<ms_id>', methods=['POST'])
+def enable_ms(ms_id):
+    try:
+        manager.enable(ms_id)
+        return jsonify({"status": "success", "mensaje": f"Microservicio {ms_id} habilitado."})
+    except Exception as e:
+        print(f"DEBUG ERROR: {e}")
+        return jsonify({"status": "error", "mensaje": str(e)}), 500
 
 
 if __name__ == '__main__':

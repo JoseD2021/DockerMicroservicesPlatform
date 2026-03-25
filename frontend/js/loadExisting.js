@@ -37,22 +37,63 @@ async function load (){
         let turnOffButtons = document.querySelectorAll("#turnOffButton");
         let deleteButtons = document.querySelectorAll("#deleteButton");
 
-
-        // TODO: Funcionalidad con la API real de HABILITAR, DESHABILITAR Y ELIMINAR microservicios
         turnOnButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
-                let id = e.target.dataset.id;
+            let id = e.target.dataset.id;
 
-                console.log(`Turning on microservice ${id}`);
-            })
-        });
+            try {
+                let response = await fetch(`http://localhost:8000/enablems/${id}`, {
+                    method: "POST"
+                });
+
+                let datos = await response.json();
+
+                if (datos.status === 'success') {
+                    alert("Microservicio habilitado exitosamente.");
+                
+                    const card = button.closest('.micro-card');
+                    if (card) {
+                        card.remove();
+                    }
+
+                    await load();
+                }
+            } catch (error) {
+                console.log("Error al habilitar el microservicio.");
+                alert("Error al habilitar el microservicio.");
+                return;
+            }
+    });
+});
+
 
         turnOffButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
                 let id = e.target.dataset.id;
 
-                console.log(`Turning off microservice ${id}`);
-            })
+                try {
+                    let response = await fetch(`http://localhost:8000/disablems/${id}`, {
+                        method: "POST"
+                    });
+
+                    let datos = await response.json();
+
+                    if (datos.status === 'success') {
+                        alert("Microservicio deshabilitado exitosamente.");
+                
+                        const card = button.closest('.micro-card');
+                        if (card) {
+                            card.remove();
+                        }
+
+                        await load();
+                    }       
+                } catch (error) {
+                    console.log("Error al deshabilitar el microservicio.");
+                    alert("Error al deshabilitar el microservicio.");
+                    return;
+                }
+    });
         });
 
         deleteButtons.forEach(button => {
