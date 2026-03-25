@@ -4,13 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="/css/prism.css" rel="stylesheet" />
 </head>
-<body>
-    <select name="lang" id="lang">
-        <option value="py">Python</option>
-        <option value="js">Node.js</option>
-    </select>
-    <textarea name="code" id="code"></textarea>
+<body class="bg-stone-900 font-sans overflow-x-hidden">
+    <div id="content" class="flex flex-col items-center gap-1">
+        <div class="bg-stone-900 w-screen flex flex-col items-center gap-5 mt-5" id="creator">
+            <button class="bg-stone-700 text-white p-2 rounded-md hover:bg-stone-600 hover:cursor-pointer z-11" id="new-button">Mostrar creación de microservicio</button>
+                
+            <div class="bg-stone-800 p-4 rounded-md flex flex-col gap-5 w-1/2 absolute top-20" id="new-wrapper" data-closed="true">
+                <input type="text" name="name" id="name" placeholder="Nombre del microservicio" class="rounded-md bg-stone-700 p-2 text-white" required>
+                <textarea name="description" id="description" placeholder="Descripción del microservicio" class="rounded-md bg-stone-700 p-2 text-white min-h-30"></textarea>
+                <select name="lang" id="lang" class="rounded-md bg-stone-700 p-2 text-white" required>
+                    <option value="" selected>Seleccione un lenguaje</option>
+                    <option value="py">Python</option>
+                    <option value="js">Javascript</option>
+                </select>
+                <label for="code" class="text-white">Código fuente</label>
+                <textarea name="code" id="code" class="min-h-24 bg-stone-700 text-white p-2 rounded-md" required></textarea>
+                <button class="rounded-2xl bg-blue-500 text-white hover:bg-blue-600 p-2 font-bold hover:cursor-pointer" type="submit" id="new-service-button">Agregar</button>
+            </div> 
+        </div>
+        <div class='bg-stone-800 w-9/10 p-4 rounded-md z-11 flex flex-col transition-all duration-300 mb-5' id="microservices-wrapper" data-showing="false">
+            <h1 class="font-bold text-xl text-white">Lista de Microservicios creados</h1>
+            <div class="grid grid-cols-3 gap-4 mt-4" id="micro-list">
+                
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+<script src="/js/loadExisting.js"></script>
+<script src="/js/addNew.js"></script>
+<!-- <script src="/js/delete.js"></script> -->
+<script src="/js/prism.js"></script>
+<script src="https:///prismjs@v1.x/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<script>
+    let newWrapper = document.getElementById('new-wrapper');    
+    let newButton = document.getElementById('new-button');
+    let hider = document.getElementById('microservices-wrapper');
+    let creator = document.getElementById('creator');
+
+    hider.style.minHeight = `calc(${creator.offsetHeight + newWrapper.offsetHeight}px + 5rem)`;
+
+    newButton.addEventListener("click", (e) => {
+        if(hider.dataset.showing === "false"){
+            hider.dataset.showing = "true";
+
+            hider.style.transform = `translateY(${creator.offsetHeight + newWrapper.offsetHeight}px)`;
+        } else {
+            hider.dataset.showing = "false";
+            
+            hider.style.transform = "translateY(0)";
+        }
+    });
+
+    const observer = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            hider.style.minHeight = `calc(${creator.offsetHeight + newWrapper.offsetHeight}px + 5rem)`;
+            if(hider.dataset.showing === "true") hider.style.transform = `translateY(${creator.offsetHeight + newWrapper.offsetHeight}px)`;
+            else hider.style.transform = "translateY(0)";
+        }
+    });
+
+    let code = document.getElementById("code");
+    let description = document.getElementById("description");
+    observer.observe(code)
+    observer.observe(description)
+</script>
