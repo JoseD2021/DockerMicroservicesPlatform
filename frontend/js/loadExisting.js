@@ -185,7 +185,7 @@ function structureMicroservice(micro) {
                 <div class="flex flex-row gap-2 mt-4 justify-end">
                     <button id="turnOnButton" data-id="${micro.id}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Habilitar</button>
                     <button id="turnOffButton" data-id="${micro.id}" class="bg-red-400 hover:bg-red-400 text-white px-3 py-1 rounded-md hover:cursor-pointer">Deshabilitar</button>
-                    <button id="deleteButton" class="deleteButton" data-id="${micro.id}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Eliminar</button>
+                    <button id="deleteButton" data-id="${micro.id}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Eliminar</button>
                 </div>
             </div>
         `;
