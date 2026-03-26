@@ -7,9 +7,10 @@
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="/css/prism.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&icon_names=progress_activity" />
 </head>
 <body class="bg-stone-900 font-sans overflow-x-hidden">
-    <div id="content" class="flex flex-col items-center gap-1">
+    <div id="content" class="flex flex-col items-center gap-1 h-[calc(100vh-5rem)]">
         <div class="bg-stone-900 w-screen flex flex-col items-center gap-5 mt-5" id="creator">
             <button class="bg-stone-700 text-white p-2 rounded-md hover:bg-stone-600 hover:cursor-pointer z-11" id="new-button">Mostrar creación de microservicio</button>
                 
@@ -23,16 +24,29 @@
                 </select>
                 <label for="code" class="text-white">Código fuente</label>
                 <textarea name="code" id="code" class="min-h-24 bg-stone-700 text-white p-2 rounded-md" required></textarea>
-                <button class="rounded-2xl bg-blue-500 text-white hover:bg-blue-600 p-2 font-bold hover:cursor-pointer" type="submit" id="new-service-button">Agregar</button>
+                <button class="relative rounded-2xl bg-blue-500 text-white hover:bg-blue-600 p-2 font-bold hover:cursor-pointer" type="submit" id="new-service-button">
+                    <span id="addingSpin" class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin opacity-0">
+                            progress_activity
+                    </span>
+                    <p id='addingText' class="pointer-events-none select-none">
+                        Agregar
+                    </p>
+                </button>
             </div> 
         </div>
-        <div class='bg-stone-800 w-9/10 p-4 rounded-md z-11 flex flex-col transition-all duration-300 mb-5' id="microservices-wrapper" data-showing="false">
+        <div class='shadow-xl bg-stone-800 w-9/10 p-4 rounded-md z-11 flex flex-col transition-all duration-300 mb-5' id="microservices-wrapper" data-showing="false">
             <h1 class="font-bold text-xl text-white">Lista de Microservicios creados</h1>
-            <div class="grid grid-cols-3 gap-4 mt-4" id="micro-list">
+            <div class="grid grid-cols-3 gap-4 mt-4 mb-[calc(5rem)]" id="micro-list">
                 
             </div>
         </div>
     </div>
+    <footer class="flex flex-row w-screen bg-stone-800 p-4 flex gap-2 h-[calc(5rem)] fixed bottom-0 z-11 shadow-[0_-4px_6px_rgba(0,0,0,0.1)]">
+        <a href="https://github.com/JoseD2021/DockerMicroservicesPlatform" target="_blank" rel="noopener noreferrer" class="flex flex-row gap-2 items-center underline">
+            <img src="/svg/github.svg" class="h-6/10" />
+            <p>José Martínez, Gabriel Páez, Jhosep Varela, Alejandro Vargas - 2026</p>
+        </a>
+    </footer>
 </body>
 </html>
 <script src="/js/loadExisting.js"></script>
@@ -46,8 +60,11 @@
     let newButton = document.getElementById('new-button');
     let hider = document.getElementById('microservices-wrapper');
     let creator = document.getElementById('creator');
+    let list = document.getElementById("micro-list");
 
-    hider.style.minHeight = `calc(${creator.offsetHeight + newWrapper.offsetHeight}px + 5rem)`;
+    let min = () => list.offsetHeight > creator.offsetHeight + newWrapper.offsetHeight ? list.offsetHeight : creator.offsetHeight + newWrapper.offsetHeight;
+
+    hider.style.minHeight = `calc(${min()}px + 10rem)`;
 
     newButton.addEventListener("click", (e) => {
         if(hider.dataset.showing === "false"){
@@ -63,7 +80,7 @@
 
     const observer = new ResizeObserver(entries => {
         for (let entry of entries) {
-            hider.style.minHeight = `calc(${creator.offsetHeight + newWrapper.offsetHeight}px + 5rem)`;
+            hider.style.minHeight = `calc(${min()}px + 10rem)`;
             if(hider.dataset.showing === "true") hider.style.transform = `translateY(${creator.offsetHeight + newWrapper.offsetHeight}px)`;
             else hider.style.transform = "translateY(0)";
         }
@@ -73,4 +90,5 @@
     let description = document.getElementById("description");
     observer.observe(code)
     observer.observe(description)
+    observer.observe(list)
 </script>
