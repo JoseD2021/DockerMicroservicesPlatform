@@ -1,4 +1,6 @@
 import os
+from os import path
+import re
 import uuid
 
 class MicroserviceManager:
@@ -65,11 +67,11 @@ class Microservice:
         # 2. Crear archivos según lenguaje
         if self.language == "py":
             self._setup_python(path)
+        elif self.language == "js":
+            self._setup_js(path)
         else:
             raise ValueError("Lenguaje no soportado")
             
-        """ if self.language == "js": mover arriba cuando se implemente
-            self._setup_js(path) """
         
         # 3. Build de imagen
         image, logs = client.images.build(
@@ -81,15 +83,39 @@ class Microservice:
         return image.id
     
     def _setup_python(self, path):
-        if(not self.code_validations()):
+        if not self.code_validations():
             raise ValueError("Código no válido")
+
+        # Detectamos función de usuario por def nombre(...)
+        func_match = re.search(r"def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", self.code)
+        func_name = func_match.group(1) if func_match else None
+
         # main.py
         with open(os.path.join(path, "main.py"), "w") as f:
-            f.write(f"""from flask import Flask
+            f.write(f"""from flask import Flask, request, jsonify
 app = Flask(__name__)
 
-@app.route("/{self.name}")
 {self.code}
+
+@app.route("/{self.name}")
+def handler():
+    try:
+        params = request.args.to_dict()
+        if {str(func_name is not None)}:
+            target = globals().get('{func_name}')
+            if target is None or not callable(target):
+                raise ValueError('Función no encontrada: {func_name}')
+            result = target(**params)
+        else:
+            # Si no hay función, se espera que el código user declare `result`
+            local_vars = {{}}
+            exec(compile({repr(self.code)}, '<string>', 'exec'), globals(), local_vars)
+            if 'result' not in local_vars:
+                raise ValueError('No se declaró `result`')
+            result = local_vars['result']
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({{"error": "Error ejecutando código", "detail": str(e)}}), 500
 
 app.run(host="0.0.0.0", port=8000)
 """)
@@ -112,7 +138,64 @@ CMD ["python", "main.py"]
     
     # TODO: Implementar setup para JS
     def _setup_js(self, path):
-        pass
+        if not self.code_validations():
+            raise ValueError("Código no válido")
+
+        func_match = re.search(r"function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(|const\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\(|let\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\(", self.code)
+        func_name = next((name for name in func_match.groups() if name), None) if func_match else None
+
+        # main.js
+        with open(os.path.join(path, "main.js"), "w") as f:
+            f.write(f"""const express = require('express');
+const app = express();
+
+{self.code}
+
+app.get('/{self.name}', async (req, res) => {{
+    try {{
+        const params = req.query;
+        let result;
+        if ({'true' if func_name else 'false'}) {{
+            const runner = eval('{func_name}');
+            if (typeof runner !== 'function') throw new Error('Función no encontrada: {func_name}');
+            result = runner(...Object.values(params));
+        }} else {{
+            if (typeof result === 'undefined') throw new Error('No se definió result ni función en el código');
+        }}
+        res.json(result);
+    }} catch (error) {{
+        res.status(500).json({{ error: 'Error ejecutando código', detail: error.toString() }});
+    }}
+}});
+
+app.listen(8000, () => {{
+    console.log('🚀 Microservicio {self.name} corriendo en puerto 8000');
+}});
+""")
+
+        # package.json
+        with open(os.path.join(path, "package.json"), "w") as f:
+            f.write("""{
+  "name": "microservice",
+  "version": "1.0.0",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+""")
+
+        # Dockerfile
+        dockerfile = """\
+FROM node:20
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 8000
+CMD ["node", "main.js"]
+"""
+        with open(os.path.join(path, "Dockerfile"), "w") as f:
+            f.write(dockerfile)
     
     def deploy_container(self, client):
         nombre_contenedor = self.image_tag
