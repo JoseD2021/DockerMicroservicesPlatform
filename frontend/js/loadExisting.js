@@ -1,21 +1,28 @@
 // Cargar lista de microservicios al cargar la página
 let microList = document.getElementById("micro-list");
-const pythonSvg = "https://s3.dualstack.us-east-2.amazonaws.com/pythondotorg-assets/media/files/python-logo-only.svg"
-const jsSvg = "https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg"
+const pythonSvg = "/svg/python.svg"
+const jsSvg = "/svg/javascript.svg"
 
-window.addEventListener("DOMContentLoaded", async () => load());
+window.addEventListener("DOMContentLoaded", async () => loadMicroservices());
 
-async function load (){
+let apiWorking = false;
+
+async function loadMicroservices() {
     try {
         let response = await fetch("http://localhost:8000/servicios");
 
         let microservices = await response.json();
+        microList.replaceChildren(); // Limpiar lista antes de cargar
+
         microservices.forEach(micro => {
+            // console.log("loading", micro);
             let microDiv = createMicroDiv(micro);
             microList.appendChild(microDiv);
         });
     } catch (error) {
+        alert("No se pudieron cargar los microservicios.");
         console.log("Error al cargar los microservicios. Llenando con placeholders.");
+        console.error(error)
 
         for (let index = 0; index < 9; index++) {
             let lang = Math.random() > 0.5 ? "py" : "js";
@@ -39,37 +46,58 @@ async function load (){
 
         turnOnButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
-            let id = e.target.dataset.id;
+                if (apiWorking) return;
 
-            try {
-                let response = await fetch(`http://localhost:8000/enablems/${id}`, {
-                    method: "POST"
-                });
+                apiWorking = true;
+                let spin = button.querySelector("#turnOnSpin");
+                let text = button.querySelector("#turnOnText");
 
-                let datos = await response.json();
+                spin.classList.toggle('opacity-0');
+                text.classList.toggle('opacity-0')
 
-                if (datos.status === 'success') {
-                    alert("Microservicio habilitado exitosamente.");
-                
-                    const card = button.closest('.micro-card');
-                    if (card) {
-                        card.remove();
+                let id = button.dataset.id;
+
+                try {
+                    let response = await fetch(`http://localhost:8000/enablems/${id}`, {
+                        method: "POST"
+                    });
+
+                    let datos = await response.json();
+
+                    if (datos.status === 'success') {
+                        //alert("Microservicio habilitado exitosamente.");
+
+                        /* const card = button.closest('.micro-card');
+                        if (card) {
+                            card.remove();
+                        } */
+
+                        await loadMicroservices();
                     }
-
-                    await load();
+                } catch (error) {
+                    console.log("Error al habilitar el microservicio.");
+                    alert("Error al habilitar el microservicio.");
+                    return;
+                } finally {
+                    apiWorking = false;
+                    spin.classList.toggle('opacity-0');
+                    text.classList.toggle('opacity-0')
                 }
-            } catch (error) {
-                console.log("Error al habilitar el microservicio.");
-                alert("Error al habilitar el microservicio.");
-                return;
-            }
-    });
-});
+            });
+        });
 
 
         turnOffButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
-                let id = e.target.dataset.id;
+                if (apiWorking) return;
+                apiWorking = true;
+
+                let id = button.dataset.id;
+                let spin = button.querySelector("#turnOffSpin");
+                let text = button.querySelector("#turnOffText");
+
+                spin.classList.toggle('opacity-0');
+                text.classList.toggle('opacity-0');
 
                 try {
                     let response = await fetch(`http://localhost:8000/disablems/${id}`, {
@@ -79,38 +107,50 @@ async function load (){
                     let datos = await response.json();
 
                     if (datos.status === 'success') {
-                        alert("Microservicio deshabilitado exitosamente.");
-                
-                        const card = button.closest('.micro-card');
+                        //alert("Microservicio deshabilitado exitosamente.");
+
+                        /* const card = button.closest('.micro-card');
                         if (card) {
                             card.remove();
-                        }
+                        } */
 
-                        await load();
-                    }       
+                        await loadMicroservices();
+                    }
                 } catch (error) {
                     console.log("Error al deshabilitar el microservicio.");
                     alert("Error al deshabilitar el microservicio.");
                     return;
+                } finally {
+                    apiWorking = false;
+                    spin.classList.toggle('opacity-0');
+                    text.classList.toggle('opacity-0')
                 }
-    });
+            });
         });
 
         deleteButtons.forEach(button => {
             button.addEventListener("click", async (e) => {
-                let id = e.target.dataset.id;
-                
+                if (apiWorking) return;
+                apiWorking = true;
+
+                let id = button.dataset.id;
+                let spin = button.querySelector("#deleteSpin");
+                let text = button.querySelector("#deleteText");
+
+                spin.classList.toggle('opacity-0');
+                text.classList.toggle('opacity-0');
+
                 try {
 
                     let response = await fetch(`http://localhost:8000/deletems/${id}`, {
                         method: "DELETE"
                     });
-            
+
                     let datos = await response.json();
 
                     if (datos.status === 'success') {
-                        alert("Microservicio borrado exitosamente.");
-                        const card = button.closest('.micro-card'); 
+                        // alert("Microservicio borrado exitosamente.");
+                        const card = button.closest('.micro-card');
                         if (card) {
                             card.remove();
                         }
@@ -121,17 +161,19 @@ async function load (){
                     console.log("Error al borrar el microservicio.");
                     alert("Error al borrar el microservicio.");
                     return;
+                } finally {
+                    apiWorking = false;
+                    spin.classList.toggle('opacity-0');
+                    text.classList.toggle('opacity-0');
                 }
-                // console.log(`Deleting microservice ${id}`);
             })
         });
     }
-
 }
 
 function createMicroDiv(micro) {
     let microDiv = document.createElement("div");
-    microDiv.classList.add("bg-stone-700", "p-4", "rounded-md", "text-white", "micro-card");
+    microDiv.classList.add("bg-stone-700", "p-4", "rounded-md", "text-white", "micro-card", "shadow-xl");
     microDiv.innerHTML = structureMicroservice(micro);
     return microDiv;
 }
@@ -166,6 +208,7 @@ function getStatus(status) {
 }
 
 function structureMicroservice(micro) {
+    isRunning = (micro.estado === 'running');
     return `
             <div class="bg-stone-700 p-4 rounded-md text-white relative">
                 <div class="absolute top-2 right-2">
@@ -183,9 +226,30 @@ function structureMicroservice(micro) {
                 <pre class="language-${micro.ms.language} rounded-xl" ><code class="language-${micro.ms.language}">${micro.ms.code}</code></pre>
                 <a href="/${micro.ms.name}" class="text-blue-400 hover:text-blue-300 underline" target="_blank">Ir a endpoint</a>
                 <div class="flex flex-row gap-2 mt-4 justify-end">
-                    <button id="turnOnButton" data-id="${micro.id}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Habilitar</button>
-                    <button id="turnOffButton" data-id="${micro.id}" class="bg-red-400 hover:bg-red-400 text-white px-3 py-1 rounded-md hover:cursor-pointer">Deshabilitar</button>
-                    <button id="deleteButton" data-id="${micro.id}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md hover:cursor-pointer">Eliminar</button>
+                    <button id="turnOnButton" data-id="${micro.id}" ${isRunning ? 'disabled' : ''} class="relative bg-green-500 text-white px-3 py-1 rounded-md ${isRunning ? 'hover:cursor-not-allowed' : 'hover:bg-green-600 hover:cursor-pointer'}">
+                        <span id="turnOnSpin" class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin opacity-0">
+                            progress_activity
+                        </span>
+                        <p id='turnOnText' class="pointer-events-none select-none">
+                            Habilitar
+                        </p>
+                    </button>
+                    <button id="turnOffButton" data-id="${micro.id}" ${!isRunning ? 'disabled' : ''} class="relative bg-red-400 text-white px-3 py-1 rounded-md ${!isRunning ? 'hover:cursor-not-allowed' : 'hover:bg-red-500 hover:cursor-pointer'}">
+                        <span id="turnOffSpin" class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin opacity-0">
+                            progress_activity
+                        </span>
+                        <p id='turnOffText' class="pointer-events-none select-none">
+                            Deshabilitar
+                        </p>
+                    </button>
+                    <button id="deleteButton" data-id="${micro.id}" class="relative bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md hover:cursor-pointer">
+                        <span id="deleteSpin" class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin opacity-0">
+                            progress_activity
+                        </span>
+                        <p id='deleteText' class="pointer-events-none select-none">
+                            Eliminar
+                        </p>
+                    </button>
                 </div>
             </div>
         `;
