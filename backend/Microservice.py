@@ -155,15 +155,15 @@ const app = express();
 app.get('/{self.name}', async (req, res) => {{
     try {{
         const params = req.query;
-        let result;
         if ({'true' if func_name else 'false'}) {{
             const runner = eval('{func_name}');
             if (typeof runner !== 'function') throw new Error('Función no encontrada: {func_name}');
-            result = runner(...Object.values(params));
+            const result = runner(...Object.values(params));
+            res.json(result);
         }} else {{
             if (typeof result === 'undefined') throw new Error('No se definió result ni función en el código');
+            res.json(result);
         }}
-        res.json(result);
     }} catch (error) {{
         res.status(500).json({{ error: 'Error ejecutando código', detail: error.toString() }});
     }}
