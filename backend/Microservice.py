@@ -11,7 +11,11 @@ class MicroserviceManager:
         self.microservices = []
         
     def add_microservice(self, name, desc, lang, code):
-        newMs = Microservice(name, desc, lang, code)
+        f_name=format_name(name)
+        if self.ms_exists(f_name):
+            raise ValueError(f"Ya existe un microservicio con el nombre '{name}'")
+        
+        newMs = Microservice(f_name, desc, lang, code)
         newMs.create(self.client)
         
         self.microservices.append(newMs)
@@ -42,10 +46,19 @@ class MicroserviceManager:
         except Exception as e:
             print(f"Error interno en enable: {e}")
     
+    def ms_exists(self, name):
+        containers = self.client.containers.list(all=True)
+    
+        for c in containers:
+            if c.labels.get("name") == name:
+                return True
+            
+        return False
+    
 
 class Microservice:
     def __init__(self, name, description, language, code):
-        self.name = name.replace(" ", "_")
+        self.name = name
         self.description = description
         self.language = language
         self.code = code
@@ -236,3 +249,6 @@ CMD ["node", "main.js"]
             return False
                 
         return True
+
+def format_name(name):
+    return name.strip().replace(" ", "_").lower()
