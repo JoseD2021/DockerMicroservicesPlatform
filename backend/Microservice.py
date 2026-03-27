@@ -86,7 +86,7 @@ class Microservice:
         if not self.code_validations():
             raise ValueError("Código no válido")
 
-        # Detectamos función de usuario por def nombre(...)
+        # Detección del nombre de la función de usuario (soporta def function() y lambda)
         func_match = re.search(r"def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", self.code)
         func_name = func_match.group(1) if func_match else None
 
@@ -136,11 +136,12 @@ CMD ["python", "main.py"]
         with open(os.path.join(path, "Dockerfile"), "w") as f:
             f.write(dockerfile)
     
-    # TODO: Implementar setup para JS
+
     def _setup_js(self, path):
         if not self.code_validations():
             raise ValueError("Código no válido")
 
+        # Detección del nombre de la función de usuario (soporta function declaration y arrow function)
         func_match = re.search(r"function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(|const\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\(|let\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\(", self.code)
         func_name = next((name for name in func_match.groups() if name), None) if func_match else None
 
