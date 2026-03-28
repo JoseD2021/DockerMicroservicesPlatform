@@ -65,14 +65,10 @@ async function loadMicroservices() {
                     let datos = await response.json();
 
                     if (datos.status === 'success') {
-                        //alert("Microservicio habilitado exitosamente.");
-
-                        /* const card = button.closest('.micro-card');
-                        if (card) {
-                            card.remove();
-                        } */
-
                         await loadMicroservices();
+                    } else {
+                        console.log("Error al habilitar el microservicio:", datos);
+                        alert("Error al habilitar el microservicio");
                     }
                 } catch (error) {
                     console.log("Error al habilitar el microservicio.");
@@ -107,14 +103,10 @@ async function loadMicroservices() {
                     let datos = await response.json();
 
                     if (datos.status === 'success') {
-                        //alert("Microservicio deshabilitado exitosamente.");
-
-                        /* const card = button.closest('.micro-card');
-                        if (card) {
-                            card.remove();
-                        } */
-
                         await loadMicroservices();
+                    } else {
+                        console.log("Error al deshabilitar el microservicio:", datos);
+                        alert("Error al deshabilitar el microservicio");
                     }
                 } catch (error) {
                     console.log("Error al deshabilitar el microservicio.");
@@ -156,6 +148,9 @@ async function loadMicroservices() {
                         }
                         // console.log(datos)
                         // location.reload();
+                    } else {
+                        console.log("Error al borrar el microservicio:", datos);
+                        alert("Error al borrar el microservicio");
                     }
                 } catch (error) {
                     console.log("Error al borrar el microservicio.");
