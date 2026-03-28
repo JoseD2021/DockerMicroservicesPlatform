@@ -58,9 +58,12 @@ def crear_servicio():
     if(not name or not description or not lang or not code):
         return jsonify({"error": "Faltan parámetros requeridos"}), 400    
     
-    manager.add_microservice(name, description, lang, code)
+    try:
+        manager.add_microservice(name, description, lang, code)
+        return jsonify({"mensaje": "Microservicio creado exitosamente", **data})
     
-    return jsonify({"mensaje": "Microservicio creado exitosamente", **data})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 @app.route('/deletems/<ms_id>', methods=['DELETE'])
 def deletems(ms_id):
