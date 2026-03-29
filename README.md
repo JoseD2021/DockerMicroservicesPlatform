@@ -1,7 +1,18 @@
 # Descripción
-Descripción de proyecto.
+Plataforma de Microservicios basada en `Traefik v3.6.11`, `Nginx Alpine` y `Python v3.12`.
+
+La dashboard cueta con la capacidad de:
+* Crear microservicios con dos lenguajes de programación: `javascript` usando NodeJS + Express y `python` usando Flask.
+* Listar microservicios creados, que estén presentes en el host.
+* Deshabilitar, habilitar, o eliminar microservicios a conveniencia con botones.
+
+Inicie la plataforma clonando el repositorio y ejecutando docker compose:
+```
+docker compose up -d
+```
 
 ## Ejemplos
+Los siguientes ejemplos pueden ser copiados y usados en el campo de **código fuente** en la creación de microservicios.
 ### Python
 ```python
 def suma(a=0, b=0):
