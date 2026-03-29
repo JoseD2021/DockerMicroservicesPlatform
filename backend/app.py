@@ -23,7 +23,7 @@ def listar_servicios():
     if client is None:
         return jsonify({"error": "No se pudo establecer un cliente Docker"}), 500
     
-    containers = client.containers.list(filters={"network": "dockermicroservicesplatform_plataforma-net"}, all=True)
+    containers = client.containers.list(filters={"network": "plataforma-net"}, all=True)
     containers = [
         c for c in containers
         if any(name.startswith("ms_") for name in c.name.split())

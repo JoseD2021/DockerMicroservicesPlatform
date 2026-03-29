@@ -56,9 +56,13 @@ newServiceButton.addEventListener("click", async (e) => {
             document.getElementById('name').value = "";
             document.getElementById('description').value = "";
         } else {
-            let errorData = await response.json();
-            console.log("Error al crear el microservicio:", errorData.error);
-            alert("Error al crear el microservicio: " + errorData.error);
+            response.json().then(data => {
+                console.log("Error al crear el microservicio:", data);
+                alert("Error al crear el microservicio");
+            }).catch(() => {
+                console.log("Error al crear el microservicio.");
+                alert("Error al crear el microservicio.");
+            });
         }
     } catch (error) {
         console.log("Error al crear el microservicio.");

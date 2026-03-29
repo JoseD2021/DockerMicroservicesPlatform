@@ -218,7 +218,7 @@ CMD ["node", "main.js"]
             self.image_tag,
             name=nombre_contenedor,
             detach=True,
-            network="dockermicroservicesplatform_plataforma-net",
+            network="plataforma-net",
 
             # Traefik
             labels={

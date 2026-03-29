@@ -40,4 +40,5 @@ services:
 
 networks:
   plataforma-net:
+    name: plataforma-net
     driver: bridge
