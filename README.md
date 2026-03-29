@@ -1,7 +1,7 @@
 # Descripción
 Plataforma de Microservicios basada en `Traefik v3.6.11`, `Nginx Alpine` y `Python v3.12`.
 
-La dashboard cueta con la capacidad de:
+La dashboard cuenta con la capacidad de:
 * Crear microservicios con dos lenguajes de programación: `javascript` usando NodeJS + Express y `python` usando Flask.
 * Listar microservicios creados, que estén presentes en el host.
 * Deshabilitar, habilitar, o eliminar microservicios a conveniencia con botones.
