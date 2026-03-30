@@ -36,4 +36,4 @@ Endpoint ejemplo: `http://localhost/saludo?nombre=Carlos`
 # Arquitectura
 Diagrama de arquitectura
 # Video
-Link de video
+Vídeo demostrativo en YouTube: https://youtu.be/pZbCYP3Kx94
