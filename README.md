@@ -35,5 +35,6 @@ Endpoint ejemplo: `http://localhost/saludo?nombre=Carlos`
 
 # Arquitectura
 Diagrama de arquitectura
+![Diagrama de Arquitectura](.diagrama-de-arquitectura.png)
 # Video
 Vídeo demostrativo en YouTube: https://youtu.be/pZbCYP3Kx94
