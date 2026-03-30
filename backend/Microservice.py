@@ -47,8 +47,11 @@ class MicroserviceManager:
             print(f"Error interno en enable: {e}")
     
     def ms_exists(self, name):
+
+        #Obtenemos los todos los contenedores del cliente Docker
         containers = self.client.containers.list(all=True)
-    
+
+        #Verificamos la existencia de un conetenedor con el mismo nombre usando labels
         for c in containers:
             if c.labels.get("name") == name:
                 return True
@@ -66,6 +69,7 @@ class Microservice:
         self.image_tag = f"ms_{self.name.lower()}_{self.project_id[:6]}"
 
     def create(self, client):
+        #Creamos la imagen y desplegamos el contenedor
         self.image(client)
         self.deploy_container(client)
         
@@ -133,7 +137,7 @@ def handler():
 app.run(host="0.0.0.0", port=8000)
 """)
 
-        # requirements.txt
+        # Dependencias para la ejecución
         with open(os.path.join(path, "requirements.txt"), "w") as f:
             f.write("flask\n")
 
@@ -187,7 +191,7 @@ app.listen(8000, () => {{
 }});
 """)
 
-        # package.json
+        # Dependencias para la ejecución
         with open(os.path.join(path, "package.json"), "w") as f:
             f.write("""{
   "name": "microservice",
@@ -214,13 +218,17 @@ CMD ["node", "main.js"]
     def deploy_container(self, client):
         nombre_contenedor = self.image_tag
         
+        # Despliegue del contenedor en la red compartida de la plataforma
+        # Se usa Traefik para exponer el servicio mediante routing por path
         container = client.containers.run(
             self.image_tag,
             name=nombre_contenedor,
             detach=True,
             network="plataforma-net",
 
-            # Traefik
+            #Se usan labels para:
+            #-Configurar routing dinamico de traefik, se usa routing por path ("/<nombre>")
+            #-Almacenar informacion del microservicio
             labels={
                 "traefik.enable": "true",
                 f"traefik.http.routers.{self.name}.rule": f"PathPrefix(`/{self.name}`)",
@@ -232,6 +240,7 @@ CMD ["node", "main.js"]
                 "code": self.code
             },
 
+            #Limitaciones de recursos para evitar que el codigo consuma recursos excesivos
             mem_limit="128m",
             nano_cpus=500000000,
         )
@@ -245,10 +254,12 @@ CMD ["node", "main.js"]
     
     
     def code_validations(self):
+        #Validacion para evitar codigo vacio
         if not self.code.strip():
             return False
                 
         return True
 
 def format_name(name):
+    # Normaliza nombres para uso seguro en URLs, Docker y labels
     return name.strip().replace(" ", "_").lower()
